@@ -1,0 +1,29 @@
+public Vector springForce(int index, ParticleDM [] past, ParticleDM person){
+		Vector fsp_up = new Vector (0,0);
+		Vector fsp_down = new Vector (0,0);
+		Vector fsp_sum;
+		ParticleDM ground = new ParticleDM();
+		ground.setXY(0, 0);
+		//between this bit and the one below
+		try{
+			fsp_down.setMag(this.k*(GraphicalFunctions.
+					distanceBetween(past[index+1].coords(), bits[index].coords())- bitLength()));
+			fsp_down.setDirection(fsp_down.direction(past[index+1], bits[index]));
+		}
+		catch(Exception ArrayOutOfBounds){
+			fsp_down.setMag(this.k*(GraphicalFunctions.
+					distanceBetween(person.coords(), bits[index].coords())- bitLength()));
+			fsp_down.setDirection(fsp_down.direction(person, bits[index]));
+		}
+		try{
+			fsp_up.setMag(this.k*(GraphicalFunctions.distanceBetween(past[index-1].coords(), bits[index].coords())- bitLength()));
+			fsp_up.setDirection(fsp_up.direction(past[index-1], bits[index]));
+		}
+		catch (Exception ArrayOutOfBounds){
+			fsp_up.setMag(this.k*(GraphicalFunctions.distanceBetween(new Coordinates(0,0), bits[index].coords())- bitLength()));
+			fsp_up.setDirection(fsp_up.direction(ground, bits[index]));
+		}
+		fsp_sum = fsp_down;
+		fsp_sum.addTo(fsp_up);
+		return fsp_sum;
+	}
