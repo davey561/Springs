@@ -26,15 +26,24 @@ public class BungeeJump extends AbstractSimulation{
 	//Declarations
 	PlotFrame bungee_window = new PlotFrame("x axis","y axis", "Veronica's Bungee Jump");;
 	Bungee chord;
-	ParticleDM person;
 	FluidDM air;
+	Trail ground = new Trail();
 	double tempmax = 0;
+	boolean full_bungee_shown = false;
 	//DO STEP
 	protected void doStep() {
-		chord.updatePositions(control.getDouble("Timestep"), person);
-		if(tempmax>chord.bits[chord.num-1].getY()){
-			tempmax = chord.bits[chord.num-1].getY();
-			System.out.println("lowest value (if top is at zero): " + tempmax);
+		for(int t = 0; t<10; t++){
+			//check to see if full bungee is yet shown
+			if(full_bungee_shown == false){
+				if(chord.bits[0].getY()<=-chord.bitLength()){
+					full_bungee_shown = true;
+				}
+			}
+			chord.updatePositions(control.getDouble("Timestep"), full_bungee_shown);
+			if(tempmax>chord.bits[chord.num-1].getY()){
+				tempmax = chord.bits[chord.num-1].getY();
+				System.out.println("lowest value (if top is at zero): " + tempmax);
+			}
 		}
 	}
 	public void initialize() {
@@ -44,15 +53,16 @@ public class BungeeJump extends AbstractSimulation{
 		bungee_window.setDefaultCloseOperation(3);
 		bungee_window.clearDrawables();
 		chord.bits[chord.num-1].mass += control.getDouble("Person Mass");
-		person = new ParticleDM();
-		//person.setMass(control.getDouble("Person Mass"));
-		person.setY(-(chord.num+1)*chord.bitLength());
 		air = new FluidDM(0);
 		chord.addToFrame(bungee_window);
-		bungee_window.setPreferredMinMax(.5*chord.bits[chord.num-1].getY(), -.5*chord.bits[chord.num-1].getY(), 2*chord.bits[chord.num-1].getY(), -.5*chord.bits[chord.num-1].getY());
-
+		bungee_window.setPreferredMinMax(-chord.length/2, chord.length/2, -6*chord.length, chord.length);
+		ground = new Trail();
+		ground.addPoint(-1029324, 0);
+		ground.addPoint(12342341, 0);
+		bungee_window.addDrawable(ground);
+		full_bungee_shown = false;
 	}
-	
+
 
 	/**
 	 * resets all control panel values
@@ -62,9 +72,10 @@ public class BungeeJump extends AbstractSimulation{
 		control.setValue("Bungee Mass", 10);
 		control.setValue("Person Mass", 50);
 		control.setValue("Spring Constant", 300);
-		control.setValue("Number of Particles", 30);
-		control.setValue("Timestep", .03); //one second
+		control.setValue("Number of Particles", 20);
+		control.setValue("Timestep", .004); //one second
 		bungee_window.clearDrawables();
+		full_bungee_shown = false;
 	}
 	/**
 	 * launches the simulation
